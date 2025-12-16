@@ -9,4 +9,9 @@ lint:
 	@echo "Linting shell scripts..."
 	@if [ -n "$(SH_FILES)" ]; then shellcheck $(SH_FILES); else echo "No shell scripts to lint."; fi
 
-.PHONY: lint
+gha-runner:
+	@echo "Installing GitHub Actions runner..."
+	./scripts/gha-runner/install.sh
+
+.PHONY: lint gha-runner
+

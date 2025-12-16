@@ -1,4 +1,11 @@
-# Infra Toolkit
+<!-- markdownlint-disable MD041 -->
+<!-- GitHub Actions Badges -->
+[![Lint](https://github.com/jerosanchez/infra-toolkit/actions/workflows/lint.yml/badge.svg)](https://github.com/jerosanchez/infra-toolkit/actions/workflows/lint.yml)
+[![Beta](https://img.shields.io/badge/status-beta-orange)](https://shields.io/)
+
+> **⚠️ WARNING: This project is still work in progress, not suited for production use yet.**
+
+# README
 
 This project is a collection of scripts and documentation (playbooks) to help set up and manage a local homelab infrastructure for personal projects.
 

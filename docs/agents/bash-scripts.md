@@ -16,37 +16,37 @@ Each Bash script should follow this structure:
    - Briefly describe what the script does and its importance.
    - Example: `This script automates the backup of a local directory to a remote server using rsync over SSH.`
 
-3. **Requirements**
-   - List all prerequisites needed before running the script.
-   - Example:
-     - `Bash shell available (/bin/bash)`
-     - `rsync and ssh installed`
-     - `SSH key-based authentication set up`
-
-4. **Script Content**
+3. **Script Content**
    - Provide the complete, well-commented script in a code block.
+   - **Organize the script logic into functions, and use a `main` function at the bottom to orchestrate the execution flow.**  
+     - The `main` function should call other logical functions in the correct order.
+     - This improves readability, maintainability, and testability.
    - Example:
 
-    ```shell
+    ```bash
     #!/bin/bash
     set -euo pipefail
-    # ...rest of the script...
+
+    do_backup() {
+        # ...backup logic...
+    }
+
+    cleanup() {
+        # ...cleanup logic...
+    }
+
+    main() {
+        do_backup
+        cleanup
+    }
+
+    main
     ```
 
-5. **Configuration**
+4. **Configuration**
    - Describe any variables or settings that need to be adjusted before use.
    - Example:
      - `Set the SRC_DIR and DEST_SERVER variables at the top of the script.`
-
-6. **Usage Instructions**
-   - Explain how to run the script and any arguments it accepts.
-   - Example:
-     - `Run the script with: ./backup.sh /path/to/source user@server:/path/to/dest`
-
-7. **References**
-   - Provide links to related scripts or documentation for further reading.
-   - Example:
-     - `See [SSH Key Setup Guide](../guides/ssh-keys.md).`
 
 ---
 
@@ -66,6 +66,7 @@ Each Bash script should follow this structure:
 - Use `read -r` to avoid mangling backslashes.
 - Avoid using `eval` unless absolutely necessary.
 - Use functions for reusable code blocks or to improve readability.
+- Always organize scripts with a `main` function that orchestrates other functions.
 - Indent with 4 spaces or tabs consistently.
 - Check command exit codes and handle errors.
 - Prefer long-form options for commands (e.g., `--help`).
