@@ -1,4 +1,4 @@
-MD_FILES := $(wildcard *.md) LICENSE
+MD_FILES := $(wildcard *.md) $(wildcard docs/**/*.md) LICENSE
 SH_FILES := $(wildcard *.sh)
 
 phony: lint
