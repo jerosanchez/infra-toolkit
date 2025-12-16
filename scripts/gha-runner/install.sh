@@ -1,12 +1,11 @@
+
 #!/bin/bash
 set -euo pipefail
 
-SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_ROLE_SCRIPT="$SCRIPTS_DIR/../shared/install-role.sh"
-INSTALL_DOCKER_SCRIPT="$SCRIPTS_DIR/../shared/install-docker.sh"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
+INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="gha-runner"
-
-NAME=""
 
 print_usage() {
     echo "Usage: $0"
@@ -20,12 +19,12 @@ parse_args() {
 }
 
 run_pre_checks() {
-    if [ ! -x "$SHARED_INSTALL_SCRIPT" ]; then
-        echo "Error: Shared install script not found or not executable: $SHARED_INSTALL_SCRIPT"
+    if [ ! -f "$INSTALL_DOCKER_SCRIPT" ]; then
+        echo "Error: Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
         exit 1
     fi
-    if [ ! -x "$INSTALL_DOCKER_SCRIPT" ]; then
-        echo "Error: Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
+    if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
+        echo "Error: Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
     fi
 }
@@ -33,20 +32,33 @@ run_pre_checks() {
 install_docker_if_needed() {
     if ! command -v docker >/dev/null 2>&1; then
         echo "Docker not found. Installing Docker..."
-        "$INSTALL_DOCKER_SCRIPT"
+        bash "$INSTALL_DOCKER_SCRIPT"
         echo "Docker installation initiated. Please reboot the server and re-run this script."
         exit 0
     fi
 }
 
+install_jq_if_needed() {
+    if ! command -v jq >/dev/null 2>&1; then
+        echo "Installing 'jq' (JSON tool)..."
+        sudo apt-get update
+        sudo apt-get install -y jq
+    fi
+}
+
+install_dependencies() {
+    install_docker_if_needed
+    install_jq_if_needed
+}
+
 install_role() {
-    "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
+    bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 }
 
 main() {
     parse_args "$@"
+    install_dependencies
     run_pre_checks
-    install_docker_if_needed
     install_role
 }
 

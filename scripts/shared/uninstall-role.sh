@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REMOVE_SERVICE_SCRIPT="${CURRENT_DIR}/remove-service.sh"
 
 SERVER_ROLE=""
 INSTALL_DIR=""
-LAUNCH_SCRIPT=""
 
 print_usage() {
     echo "Usage: $0 <server-role>"
@@ -20,23 +20,20 @@ parse_args() {
     
 	SERVER_ROLE="$1"
 	INSTALL_DIR="/opt/$SERVER_ROLE"
-	LAUNCH_SCRIPT="start-$SERVER_ROLE.sh"
 }
 
 run_pre_checks() {
-    if [ ! -x "$remove_service_script" ]; then
-        echo "Error: remove-service.sh not found or not executable: $remove_service_script"
-        exit 1
-    fi
+    if [ ! -f "$REMOVE_SERVICE_SCRIPT" ]; then
+		echo "Service helper script not found: $REMOVE_SERVICE_SCRIPT"
+		exit 1
+	fi
 }
 
-call_remove_service() {
-    local remove_service_script="$SCRIPTS_DIR/remove-service.sh"
-    
-    "$remove_service_script" "$SERVER_ROLE"
+remove_service() {
+    sudo bash "$REMOVE_SERVICE_SCRIPT" $SERVER_ROLE
 }
 
-remove_installation_files() {
+remove_files() {
     if [ -d "$INSTALL_DIR" ]; then
         echo "Removing installation directory: $INSTALL_DIR"
         sudo rm -rf "$INSTALL_DIR"
@@ -50,8 +47,8 @@ print_success() {
 main() {
     parse_args "$@"
     run_pre_checks
-    call_remove_service
-    remove_installation_files
+    remove_files
+    remove_service
     print_success
 }
 

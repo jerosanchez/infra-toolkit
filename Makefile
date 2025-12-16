@@ -1,3 +1,4 @@
+# Install Docker
 MD_FILES := $(wildcard *.md) $(wildcard docs/**/*.md) LICENSE
 SH_FILES := $(wildcard *.sh)
 
@@ -11,7 +12,7 @@ lint:
 
 gha-runner:
 	@echo "Installing GitHub Actions runner..."
-	./scripts/gha-runner/install.sh
+	bash ./scripts/gha-runner/install.sh
 
 .PHONY: lint gha-runner
 

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$CURRENT_DIR/.env"
+
 print_usage() {
     echo "Usage: $0"
 }
@@ -12,10 +15,10 @@ parse_args() {
 }
 
 load_env() {
-  if [ -f /home/jero/.env ]; then
-    source /home/jero/.env
+  if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
   else
-    echo "Missing .env file with secrets. Exiting."
+    echo "Missing .env file with secrets in $SCRIPT_DIR. Exiting."
     exit 1
   fi
 }
