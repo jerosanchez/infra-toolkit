@@ -23,13 +23,13 @@ sudo apt install jq
 
 ## Step 2: Get Your GitHub PAT
 
-1. Go to [https://github.com/settings/tokens](https://github.com/settings/tokens)
-2. Click **"Generate new token (classic)"** (or **"Fine-grained token"** for more control)
-3. Give your token a name and set an expiration date (I use 30 days for real-world discipline)
-4. Select the required scopes:
+- Go to [https://github.com/settings/tokens](https://github.com/settings/tokens)
+- Click **"Generate new token (classic)"** (or **"Fine-grained token"** for more control)
+- Give your token a name and set an expiration date (I use 30 days for real-world discipline)
+- Select the required scopes:
   - For public repos: `repo`
-  - For private repos: `repo` and `admin:repo_hook`
-5. Click **"Generate token"** and copy it (you won’t see it again)
+  - For private repos: `repo` and `admin:repo_hook`s
+- Click **"Generate token"** and copy it (you won’t see it again)
 
 ---
 
