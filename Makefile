@@ -14,5 +14,9 @@ gha-runner:
 	@echo "Installing GitHub Actions runner..."
 	bash ./scripts/gha-runner/install.sh
 
+registry:
+	@echo "Installing Docker registry..."
+	bash ./scripts/registry/install.sh
+
 .PHONY: lint gha-runner
 
