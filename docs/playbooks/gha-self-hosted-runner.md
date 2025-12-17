@@ -40,7 +40,25 @@ All other steps—installing dependencies, configuring the runner, setting up sy
 
 ---
 
-## Step 3: Configure Your Workflow
+## Step 3: Configure `/etc/hosts` for Registry Access
+
+If your Docker registry runs on a separate VM and does not have a DNS entry, add its IP and hostname to the runner’s `/etc/hosts` file:
+
+```bash
+sudo nano /etc/hosts
+```
+
+Add a line like:
+
+```text
+192.168.1.216   registry.local
+```
+
+Now you can push images to `registry.local:5000` from your workflows.
+
+---
+
+## Step 4: Configure Your Workflow
 
 In your workflow YAML (e.g., `.github/workflows/deploy.yml`):
 

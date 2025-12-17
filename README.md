@@ -22,8 +22,10 @@ cd infra-toolkit
 
 Then choose and install a role:
 
-This toolkit uses a role-based approach to automate server setup. Each role configures a server for a specific purpose.Currently, the following role is available:
+This toolkit uses a role-based approach to automate server setup. Each role configures a server for a specific purpose. Currently, the following roles are available:
 
 - **GHA self-hosted runner**: Installs and manages a GitHub Actions runner in a Docker container, with automated setup and systemd integration. See [scripts/gha-runner/README.md](scripts/gha-runner/README.md) for full instructions.
 
-Then follow the prompts and documentation to configure your GitHub credentials and start the runner.
+- **Docker registry**: Installs and manages a private Docker registry for your local network, with automated setup, persistence, and cleanup. See [scripts/registry/README.md](scripts/registry/README.md) for full instructions.
+
+Then follow the prompts and documentation to configure your environment and start the desired role(s).
