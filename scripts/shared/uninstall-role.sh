@@ -30,7 +30,7 @@ run_pre_checks() {
 }
 
 remove_service() {
-    sudo bash "$REMOVE_SERVICE_SCRIPT" $SERVER_ROLE
+    sudo bash "$REMOVE_SERVICE_SCRIPT" "$SERVER_ROLE"
 }
 
 remove_files() {

@@ -18,6 +18,7 @@ parse_args() {
 
 load_env() {
     if [ -f /opt/$SERVER_ROLE/.env ]; then
+        # shellcheck source=/dev/null
         source "/opt/$SERVER_ROLE/.env"
     fi
 }

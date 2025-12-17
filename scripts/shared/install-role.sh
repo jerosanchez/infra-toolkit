@@ -1,3 +1,4 @@
+#!/bin/bash
 set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,7 +33,7 @@ run_pre_checks() {
 
 	if [ ! -f "$SOURCE_PATH/$ENV_EXAMPLE_FILE" ]; then
 		echo "SRC_.env.example file not found: $SOURCE_PATH/$ENV_EXAMPLE_FILE"
-		exit SRC_1
+		exit 1
 	fi
 
 	if [ ! -f "$CREATE_SERVICE_SCRIPT" ]; then
@@ -51,7 +52,7 @@ copy_files() {
 }
 
 create_service() {
-	sudo bash "$CREATE_SERVICE_SCRIPT" $SERVER_ROLE $INSTALL_PATH/$ROLE_START_SCRIPT
+	sudo bash "$CREATE_SERVICE_SCRIPT" "$SERVER_ROLE" "$INSTALL_PATH/$ROLE_START_SCRIPT"
 }
 
 print_success() {

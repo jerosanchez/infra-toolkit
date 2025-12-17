@@ -1,6 +1,6 @@
 # Install Docker
-MD_FILES := $(wildcard *.md) $(wildcard docs/**/*.md) LICENSE
-SH_FILES := $(wildcard *.sh)
+MD_FILES := $(shell find . -type f -name '*.md') LICENSE
+SH_FILES := $(shell find . -type f -name '*.sh')
 
 phony: lint
 
@@ -11,12 +11,12 @@ lint:
 	@if [ -n "$(SH_FILES)" ]; then shellcheck $(SH_FILES); else echo "No shell scripts to lint."; fi
 
 gha-runner:
-	@echo "Installing GitHub Actions runner..."
+	@echo "Installing GitHub Actions runner role..."
 	bash ./scripts/gha-runner/install.sh
 
 registry:
-	@echo "Installing Docker registry..."
+	@echo "Installing Docker registry role..."
 	bash ./scripts/registry/install.sh
 
-.PHONY: lint gha-runner
+.PHONY: lint gha-runner registry
 

@@ -16,6 +16,7 @@ parse_args() {
 
 load_env() {
   if [ -f "$ENV_FILE" ]; then
+    # shellcheck source=/dev/null
     source "$ENV_FILE"
   else
     echo "Missing .env file with secrets in $SCRIPT_DIR. Exiting."
@@ -51,12 +52,12 @@ remove_existing_container() {
 }
 
 launch_runner() {
-  docker run -d --name $RUNNER_NAME \
-    -v $CONFIG_DIR:/runner \
+  docker run -d --name "$RUNNER_NAME" \
+    -v "$CONFIG_DIR":/runner \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -e RUNNER_NAME=$RUNNER_NAME \
-    -e REPO_URL=https://github.com/$GITHUB_OWNER/$GITHUB_REPO \
-    -e RUNNER_TOKEN=$REG_TOKEN \
+    -e RUNNER_NAME="$RUNNER_NAME" \
+    -e REPO_URL="https://github.com/$GITHUB_OWNER/$GITHUB_REPO" \
+    -e RUNNER_TOKEN="$REG_TOKEN" \
     myoung34/github-runner:ubuntu-noble
 }
 

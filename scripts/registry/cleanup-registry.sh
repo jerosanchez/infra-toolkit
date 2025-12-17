@@ -29,6 +29,7 @@ run_pre_checks() {
 
 load_env() {
     if [ -f "$ENV_FILE" ]; then
+        # shellcheck source=/dev/null
         source "$ENV_FILE"
     else
         echo "Missing .env file with configuration in $CURRENT_DIR. Exiting."

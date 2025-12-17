@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPT_SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
-
 print_usage() {
     echo "Usage: $0"
 }
