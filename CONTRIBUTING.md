@@ -1,4 +1,4 @@
-# Contributing to sync-repos
+# Contributing to infra-toolkit
 
 Thank you for your interest in contributing!
 
@@ -84,13 +84,13 @@ Please follow these common practices when contributing to this project:
   - Be responsive to review feedback and update your PR as needed.
 
 - **Code Style:**  
-  - Follow the guidelines in [AGENTS.md](AGENTS.md) for markdown, bash scripts, and Makefiles.
+  - Follow the guidelines in `docs/agents/` for markdown, bash scripts, and Makefiles.
   - Add comments where helpful for maintainability.
 
 - **Discussions:**  
   - Use issues or PR comments for questions, suggestions, or feedback.
 
-Thank you for helping improve sync-repos!
+Thank you for helping improve infra-toolkit!
 
 ## Need Help?
 
