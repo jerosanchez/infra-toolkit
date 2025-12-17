@@ -11,7 +11,9 @@ This project is a collection of scripts and documentation (playbooks) to help se
 
 ## Getting Started
 
-To get started with infra-toolkit on a new VM:
+Read the playbooks located in [docs/playbooks/](docs/playbooks/) to setup a Proxmox-based infrastructure.
+
+Once you have the infrastructure ready, you can spin up new VMs and assign them a role using this toolkit as follows:
 
 First clone the repository:
 
@@ -20,33 +22,17 @@ git clone https://github.com/jerosanchez/infra-toolkit.git
 cd infra-toolkit
 ```
 
-Then choose and install a rol using `make`.
+Then choose and install a rol using `make`:
 
-This toolkit uses a role-based approach to automate server setup. Each role configures a server for a specific purpose. Currently, the following roles are available:
-
-- **GHA self-hosted runner**: Run `make gha-runner`. See [scripts/gha-runner/README.md](scripts/gha-runner/README.md) for details.
+- **GHA self-hosted runner**: Run `make gha-runner`. See [scripts/gha-runner/README.md](scripts/gha-runner/README.md)
+for details.
 - **Docker registry**: Run `make registry`. See [scripts/registry/README.md](scripts/registry/README.md) for details.
 
-## Playbooks and Documentation
+## Future Improvements
 
-This repository includes a set of playbooks located in [docs/playbooks/](docs/playbooks/) that provide detailed, step-by-step instructions for:
-
-- Understanding and using each role’s scripts (e.g., GitHub Actions runner, Docker registry)
-- Setting up and managing a Proxmox-based infrastructure, including:
-  - Proxmox node setup
-  - Proxmox cluster creation
-  - Creating VM templates
+- Add roles for production and staging environments to support more advanced deployment scenarios.
+- Provide Terraform and/or Ansible scripts to automate:
+  - Creation of Proxmox VM templates
   - Spinning up VMs from templates
-  - Server remote access
-  - Docker on Ubuntu
-
-Refer to the relevant playbook for comprehensive guidance on each topic:
-
-- [gha-self-hosted-runner.md](docs/playbooks/gha-self-hosted-runner.md): GitHub Actions runner setup
-- [docker-registry.md](docs/playbooks/docker-registry.md): Docker registry setup
-- [proxmox-node.md](docs/playbooks/proxmox-node.md): Proxmox node setup
-- [proxmox-cluster.md](docs/playbooks/proxmox-cluster.md): Proxmox cluster setup
-- [proxmox-vm-template.md](docs/playbooks/proxmox-vm-template.md): VM template creation
-- [proxomox-vm-from-tmpl.md](docs/playbooks/proxomox-vm-from-tmpl.md): Spinning up VMs from templates
-- [server-remote-access.md](docs/playbooks/server-remote-access.md): Remote access setup
-- [ubuntu-docker.md](docs/playbooks/ubuntu-docker.md): Docker installation on Ubuntu
+  - Full infrastructure provisioning and configuration
+- Expand playbooks and scripts for additional homelab and cloud-native use cases.
