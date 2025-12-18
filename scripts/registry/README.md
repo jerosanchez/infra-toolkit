@@ -50,6 +50,7 @@ This command will:
 2. Copy all necessary files to `/opt/registry/`
 3. Create a systemd service named `registry.service`
 4. Enable the service for automatic startup
+5. Start the service
 
 After installation, configure your registry settings:
 
@@ -101,8 +102,7 @@ This would remove images older than 14 days.
 To remove the registry and clean up the server:
 
 ```bash
-cd ~/infra-toolkit/scripts/registry
-sudo ./uninstall.sh
+make registry-rm
 ```
 
 This will:
@@ -113,25 +113,6 @@ This will:
 4. Remove the registry data directory (all images stored in the registry will be deleted)
 
 The server will be ready to be assigned a different role or decommissioned.
-
----
-
-## How It Works
-
-### Installation Process
-
-The installation follows a multi-stage process leveraging shared utility scripts:
-
-1. **install.sh** serves as the entry point and:
-   - Validates the presence of required shared scripts
-   - Calls `install-docker.sh` if Docker is not installed
-   - Delegates role installation to `install-role.sh`
-
-2. **install-role.sh** (shared utility) handles the generic role assignment:
-   - Copies `start-registry.sh` to `/opt/registry/`
-   - Creates `/opt/registry/.env` from `.env.example`
-   - Sets proper file permissions
-   - Invokes `create-service.sh` to configure systemd
 
 ---
 

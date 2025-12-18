@@ -18,5 +18,7 @@ registry:
 	@echo "Installing Docker registry role..."
 	bash ./scripts/registry/install.sh
 
-.PHONY: lint gha-runner registry
+registry-rm:
+	bash ./scripts/registry/uninstall.sh
 
+.PHONY: lint gha-runner registry registry-rm

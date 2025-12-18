@@ -28,6 +28,24 @@ All steps—installing dependencies, configuring the registry, setting up persis
 
 To push Docker images to your local registry from a self-hosted runner or local machine, update your workflow YAML as follows:
 
+**Important:** If your registry is running without HTTPS (plain HTTP), Docker will refuse to push images unless you configure it to allow insecure registries. On the machine where you build and push images, add the following to `/etc/docker/daemon.json`:
+
+```json
+{
+  "insecure-registries": ["registry.local:5000"]
+}
+```
+
+Then restart Docker:
+
+```bash
+sudo systemctl restart docker
+```
+
+This allows Docker to push images to your local registry over HTTP. If you skip this, you may see errors like:
+
+`server gave HTTP response to HTTPS client`
+
 1. **Tag your image for the local registry:**
 
     ```yaml

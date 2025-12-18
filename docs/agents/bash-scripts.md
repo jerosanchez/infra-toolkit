@@ -70,6 +70,7 @@ Each Bash script should follow this structure:
 - Indent with 4 spaces or tabs consistently.
 - Check command exit codes and handle errors.
 - Prefer long-form options for commands (e.g., `--help`).
+- Do not add new functions on top of the file, insert it following a logical sequence.
 
 ---
 

@@ -2,15 +2,20 @@
 set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+
 INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
 INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="registry"
+
+# Includes
+source "$CURRENT_DIR/../shared/logging.sh"
 
 print_usage() {
     echo "Usage: $0"
 }
 
 parse_args() {
+    log DEBUG "Parsing arguments..."
     if [ "$#" -ne 0 ]; then
         print_usage
         exit 1
@@ -18,52 +23,70 @@ parse_args() {
 }
 
 run_pre_checks() {
+    log DEBUG "Running pre-checks..."
     if [ ! -f "$INSTALL_DOCKER_SCRIPT" ]; then
-        echo "Error: Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
+        log ERROR "Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
         exit 1
     fi
     if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
-        echo "Error: Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
+        log ERROR "Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
     fi
 }
 
 install_jq_if_needed() {
+    log DEBUG "Installing 'jq' (JSON tool)..."
     if ! command -v jq >/dev/null 2>&1; then
-        echo "Installing 'jq' (JSON tool)..."
-        sudo apt-get update
-        sudo apt-get install -y jq
+        sudo apt-get update && sudo apt-get install -y jq
+    else
+        log DEBUG "'jq' already installed."
+    fi
+}
+
+install_crontab_if_needed() {
+    log DEBUG "Installing 'crontab' (cron package)..."
+    if ! command -v crontab >/dev/null 2>&1; then
+        sudo apt-get update && sudo apt-get install -y cron
+    else
+        log DEBUG "'crontab' already installed."
     fi
 }
 
 install_docker_if_needed() {
+    log DEBUG "Installing Docker..."
     if ! command -v docker >/dev/null 2>&1; then
-        echo "Docker not found. Installing Docker..."
         bash "$INSTALL_DOCKER_SCRIPT"
-        echo "Docker installation initiated. Please reboot the server and re-run this script."
+        log INFO "Docker installation initiated. Please reboot the server and re-run this script."
         exit 0
+    else
+        log DEBUG "Docker already installed."
     fi
 }
 
-install_dependencies() {
+install_dependencies() {    
+    log INFO "Installing dependencies..."
     install_jq_if_needed
     install_docker_if_needed
+    install_crontab_if_needed
 }
 
 copy_cleanup_script() {
+    log INFO "Copying cleanup script..."
     local dest_dir="/opt/registry"
     local script_src="$CURRENT_DIR/cleanup-registry.sh"
     if [ -f "$script_src" ]; then
         sudo cp "$script_src" "$dest_dir/"
         sudo chmod +x "$dest_dir/cleanup-registry.sh"
+    else
+        log ERROR "Cleanup script not found: $script_src"
     fi
 }
 
 schedule_cleanup_cron() {
+    log INFO "Scheduling cleanup job..."
     # Schedule the cleanup script to run daily at 2 AM with a retention of 7 days
     local cron_line="0 2 * * * /opt/registry/cleanup-registry.sh 7 >/var/log/registry-cleanup.log 2>&1"
-    # Remove any existing line for this script before adding the new one
-    (crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh'; echo "$cron_line") | crontab -
+    (sudo crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh' || true; echo "$cron_line") | sudo crontab -
 }
 
 install_role() {
@@ -72,11 +95,19 @@ install_role() {
     schedule_cleanup_cron
 }
 
+start_registry() {
+    log INFO "Starting registry..."
+    sudo /opt/registry/start-registry.sh
+}
+
 main() {
     parse_args "$@"
     install_dependencies
     run_pre_checks
     install_role
+    start_registry
+    
+    log INFO "Registry installation complete."
 }
 
 main "$@"
