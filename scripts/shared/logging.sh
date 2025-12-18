@@ -15,7 +15,8 @@ log() {
     local LOG_LEVEL_PRIORITY=${LOG_LEVELS[$LOG_LEVEL_ENV]:-3}
     local MSG_LEVEL_PRIORITY=${LOG_LEVELS[$level]:-3}
 
-    local caller_script="$(basename "${BASH_SOURCE[1]}")"
+    local caller_script
+    caller_script="$(basename "${BASH_SOURCE[1]}")"
 
     # If LOG_LEVEL is NONE or message is lower priority, do not print
     if [ "$LOG_LEVEL_PRIORITY" -eq 0 ] || [ "$MSG_LEVEL_PRIORITY" -gt "$LOG_LEVEL_PRIORITY" ]; then

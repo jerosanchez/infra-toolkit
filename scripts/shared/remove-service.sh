@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SERVICE_NAME=""
 SERVICE_FILE=""
 
 # Includes
-source "$SCRIPT_DIR/logging.sh"
+source "$CURRENT_DIR/../shared/logging.sh"
 
 parse_args() {
     log DEBUG "Parsing arguments..."
