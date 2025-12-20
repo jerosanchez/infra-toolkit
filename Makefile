@@ -14,6 +14,9 @@ gha-runner:
 	@echo "Installing GitHub Actions runner role..."
 	bash ./scripts/gha-runner/install.sh
 
+gha-runner-rm:
+	bash ./scripts/gha-runner/uninstall.sh
+
 registry:
 	@echo "Installing Docker registry role..."
 	bash ./scripts/registry/install.sh
@@ -21,4 +24,11 @@ registry:
 registry-rm:
 	bash ./scripts/registry/uninstall.sh
 
-.PHONY: lint gha-runner registry registry-rm
+app-stack:
+	@echo "Installing application stack role..."
+	bash ./scripts/app-stack/install.sh
+
+app-stack-rm:
+	bash ./scripts/app-stack/uninstall.sh
+
+.PHONY: lint gha-runner gha-runner-rm registry registry-rm app-stack app-stack-rm

@@ -6,47 +6,59 @@ This document provides a structured approach for AI agents to create safe, reada
 
 ## Structure of a Bash Script
 
-Each Bash script should follow this structure:
+Each Bash script must be modular and follow this structure:
 
-1. **Title**
-   - Clearly state the purpose of the script.
-   - Example: `# Backup Directory to Remote Server Script`
+1. **Script Content**
+     - All scripts must be organized into explicit, purpose-driven functions. Function names must clearly describe their purpose (e.g., `parse_arguments`, `run_pre_checks`, `start_runner_container`).
+     - Use a `main` function at the bottom to orchestrate execution, and invoke it as `main "$@"`.
+     - Required functions in every script:
+         - `print_usage`: Print usage instructions.
+         - `parse_arguments`: Handle and validate command-line arguments, call `print_usage` on error.
+         - `run_pre_checks`: Perform pre-execution checks (e.g., dependencies, environment).
+         - Additional functions for script logic as needed, with explicit names.
+     - Only use comments for logic that is not obvious.
+     - Always look at other scripts under `scripts/` for established patterns and naming conventions.
+     - Make use of helper functions and shared logic under `scripts/shared/` by including them at the top of your script, following the pattern:
 
-2. **Introduction**
-   - Briefly describe what the script does and its importance.
-   - Example: `This script automates the backup of a local directory to a remote server using rsync over SSH.`
+        ```bash
+        source "$CURRENT_DIR/../shared/logging.sh"
+        ```
 
-3. **Script Content**
-   - Provide the complete, well-commented script in a code block.
-   - **Organize the script logic into functions, and use a `main` function at the bottom to orchestrate the execution flow.**  
-     - The `main` function should call other logical functions in the correct order.
-     - This improves readability, maintainability, and testability.
-   - Example:
+     - Include any other shared files as needed, as shown in other scripts (e.g., `install-docker.sh`, `install-role.sh`).
+     - Example template:
 
     ```bash
     #!/bin/bash
     set -euo pipefail
 
-    do_backup() {
-        # ...backup logic...
+    print_usage() {
+        echo "Usage: $0"
     }
 
-    cleanup() {
-        # ...cleanup logic...
+    parse_arguments() {
+        if [ "$#" -ne 0 ]; then
+            print_usage
+            exit 1
+        fi
+    }
+
+    run_pre_checks() {
+        # Non-obvious pre-check logic here
     }
 
     main() {
-        do_backup
-        cleanup
+        parse_arguments "$@"
+        run_pre_checks
+        # Call other explicit logic functions as needed
     }
 
-    main
+    main "$@"
     ```
 
-4. **Configuration**
+2. **Configuration**
    - Describe any variables or settings that need to be adjusted before use.
    - Example:
-     - `Set the SRC_DIR and DEST_SERVER variables at the top of the script.`
+     - `Set the SERVER_ROLE and CONFIG_DIR variables at the top of the script.`
 
 ---
 

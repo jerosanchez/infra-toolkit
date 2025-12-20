@@ -24,9 +24,17 @@ cd infra-toolkit
 
 Then choose and install a rol using `make`:
 
-- **GHA self-hosted runner**: Run `make gha-runner`. See [scripts/gha-runner/README.md](scripts/gha-runner/README.md)
-for details.
-- **Docker registry**: Run `make registry`. See [scripts/registry/README.md](scripts/registry/README.md) for details.
+- **GHA self-hosted runner**: Run `make gha-runner`. Deploys a GitHub Actions self-hosted runner for CI/CD workflows on your infrastructure.
+
+See [scripts/gha-runner/README.md](scripts/gha-runner/README.md) for details.
+
+- **Docker registry**: Run `make registry`. Deploys a private Docker registry for storing and distributing container images locally, with automated cleanup and service management.
+
+See [scripts/registry/README.md](scripts/registry/README.md) for details.
+
+- **App stack (Spring Boot + PostgreSQL)**: Run `make app-stack`. Deploys a modular monolith application and database using Docker Compose, with automated backup and cleanup scripts.
+
+See [scripts/app-stack/README.md](scripts/app-stack/README.md) for details.
 
 ## Future Improvements
 

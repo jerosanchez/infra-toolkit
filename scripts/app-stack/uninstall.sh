@@ -4,7 +4,7 @@ set -euo pipefail
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 UNINSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/uninstall-role.sh"
-SERVER_ROLE="registry"
+SERVER_ROLE="app-stack"
 
 # Includes
 source "$CURRENT_DIR/../shared/logging.sh"
@@ -37,44 +37,41 @@ run_pre_checks() {
         exit 1
     fi
     if [ ! -f "/opt/$SERVER_ROLE/.env" ]; then
-        log WARN "No .env file found."
+        log ERROR "No .env file found."
+        exit 1
+    fi
+    if [ ! -f "/opt/$SERVER_ROLE/docker-compose.yml" ]; then
+        log ERROR "No docker-compose.yml file found."
+        exit 1
     fi
 }
 
-remove_existing_container() {
-    log INFO "Removing existing container..."
-    if [ -z "${REGISTRY_CONTAINER_NAME:-}" ]; then
-        log WARN "REGISTRY_CONTAINER_NAME is not set. Skipping container removal."
-        return 0
-    fi
-    if docker ps -a --format '{{.Names}}' | grep -Eq "^${REGISTRY_CONTAINER_NAME}$"; then
-        docker stop "$REGISTRY_CONTAINER_NAME"
-        docker rm "$REGISTRY_CONTAINER_NAME"
-    else
-        log WARN "No existing container found."
-    fi
+stop_compose_stack() {
+    log INFO "Stopping Docker Compose stack..."
+    cd /opt/$SERVER_ROLE
+    docker compose down || log WARN "Failed to stop compose stack."
 }
 
-cleanup_data_dir() {
-    log INFO "Removing registry data directory..."
-    if [ -n "${REGISTRY_DATA_DIR:-}" ] && [ -d "$REGISTRY_DATA_DIR" ]; then
-        rm -rf "$REGISTRY_DATA_DIR"
+remove_containers() {
+    log INFO "Removing app stack containers..."
+    local project_name="${COMPOSE_PROJECT_NAME:-app-stack}"
+    if docker ps -a --format '{{.Names}}' | grep -q "^${project_name}-"; then
+        docker ps -a --format '{{.Names}}' | grep "^${project_name}-" | xargs -r docker rm -f
     else
-        log WARN "Data directory not found."
+        log WARN "No app stack containers found."
     fi
 }
 
 remove_cleanup_cron() {
-    log INFO "Removing cleanup job..."
-    # Remove any line containing /opt/registry/cleanup-registry.sh
-    (sudo crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh' || true; echo "") | sudo crontab -
+    log INFO "Removing backup cleanup job..."
+    # Remove any line containing /opt/app-stack/cleanup-backups.sh
+    (sudo crontab -l 2>/dev/null | grep -v '/opt/app-stack/cleanup-backups.sh' || true; echo "") | sudo crontab -
 }
 
 uninstall_role() {
     LOG_LEVEL="$LOG_LEVEL" bash "$UNINSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific uninstallation tasks
-    cleanup_data_dir
     remove_cleanup_cron
 }
 
@@ -82,12 +79,11 @@ main() {
     parse_args "$@"
     load_env
     run_pre_checks
+    stop_compose_stack
+    remove_containers
     uninstall_role
-    remove_existing_container
-    cleanup_data_dir
-    remove_cleanup_cron
 
-    log INFO "Registry uninstallation complete."
+    log INFO "App stack uninstallation complete."
 }
 
 main "$@"

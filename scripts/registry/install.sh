@@ -84,13 +84,15 @@ copy_cleanup_script() {
 
 schedule_cleanup_cron() {
     log INFO "Scheduling cleanup job..."
-    # Schedule the cleanup script to run daily at 2 AM with a retention of 7 days
+    # Schedule the cleanup script to run daily at 2 AM
     local cron_line="0 2 * * * /opt/registry/cleanup-registry.sh 7 >/var/log/registry-cleanup.log 2>&1"
     (sudo crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh' || true; echo "$cron_line") | sudo crontab -
 }
 
 install_role() {
     bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
+
+    # Additional role-specific installation tasks
     copy_cleanup_script
     schedule_cleanup_cron
 }
