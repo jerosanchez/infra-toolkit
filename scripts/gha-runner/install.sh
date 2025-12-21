@@ -2,7 +2,6 @@
 set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
 INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="gha-runner"
 
