@@ -8,13 +8,17 @@ SERVER_ROLE="gha-runner"
 
 # Includes
 
+source "$CURRENT_DIR/../shared/lib/logging.sh"
 source "$CURRENT_DIR/../shared/lib/dependencies.sh"
+
+export LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
 }
 
 parse_args() {
+    log DEBUG "Parsing arguments..."
     if [ "$#" -ne 0 ]; then
         print_usage
         exit 1
@@ -22,23 +26,21 @@ parse_args() {
 }
 
 run_pre_checks() {
-    if [ ! -f "$INSTALL_DOCKER_SCRIPT" ]; then
-        echo "Error: Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
-        exit 1
-    fi
+    log DEBUG "Running pre-checks..."
     if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
-        echo "Error: Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
+        log ERROR "Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
     fi
 }
 
 install_dependencies() {
+    log INFO "Installing dependencies..."
     install_docker_if_needed
     install_jq_if_needed
 }
 
 install_role() {
-    bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
+    LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 }
 
 main() {
@@ -46,6 +48,8 @@ main() {
     install_dependencies
     run_pre_checks
     install_role
+
+    echo "Installation complete."
 }
 
 main "$@"

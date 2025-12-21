@@ -47,8 +47,8 @@ WantedBy=multi-user.target
 EOF
 }
 
-start_service() {
-    log INFO "Starting service..."
+enable_service() {
+    log INFO "Enabling service..."
     log DEBUG "Enabling and starting $SERVICE_NAME service..."
     sudo systemctl daemon-reload
     sudo systemctl enable "$SERVICE_NAME.service"
@@ -58,7 +58,7 @@ main() {
     parse_args "$@"
     run_pre_checks
     create_service_file
-    start_service
+    enable_service
     log DEBUG "Service creation complete."
 }
 
