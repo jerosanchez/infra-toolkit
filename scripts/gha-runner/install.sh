@@ -6,6 +6,10 @@ INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
 INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="gha-runner"
 
+# Includes
+
+source "$CURRENT_DIR/../shared/lib/dependencies.sh"
+
 print_usage() {
     echo "Usage: $0"
 }
@@ -25,23 +29,6 @@ run_pre_checks() {
     if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
         echo "Error: Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
-    fi
-}
-
-install_docker_if_needed() {
-    if ! command -v docker >/dev/null 2>&1; then
-        echo "Docker not found. Installing Docker..."
-        bash "$INSTALL_DOCKER_SCRIPT"
-        echo "Docker installation initiated. Please reboot the server and re-run this script."
-        exit 0
-    fi
-}
-
-install_jq_if_needed() {
-    if ! command -v jq >/dev/null 2>&1; then
-        echo "Installing 'jq' (JSON tool)..."
-        sudo apt-get update
-        sudo apt-get install -y jq
     fi
 }
 

@@ -7,7 +7,9 @@ UNINSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/uninstall-role.sh"
 SERVER_ROLE="registry"
 
 # Includes
-source "$CURRENT_DIR/../shared/logging.sh"
+source "$CURRENT_DIR/../shared/lib/logging.sh"
+source "$CURRENT_DIR/../shared/lib/scheduling.sh"
+
 export LOG_LEVEL="INFO"
 
 print_usage() {
@@ -64,18 +66,12 @@ cleanup_data_dir() {
     fi
 }
 
-remove_cleanup_cron() {
-    log INFO "Removing cleanup job..."
-    # Remove any line containing /opt/registry/cleanup-registry.sh
-    (sudo crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh' || true; echo "") | sudo crontab -
-}
-
 uninstall_role() {
     LOG_LEVEL="$LOG_LEVEL" bash "$UNINSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific uninstallation tasks
     cleanup_data_dir
-    remove_cleanup_cron
+    unschedule "$SERVER_ROLE" "cleanup-registry.sh"
 }
 
 main() {

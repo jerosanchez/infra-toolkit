@@ -7,7 +7,7 @@ SERVICE_NAME=""
 SERVICE_FILE=""
 
 # Includes
-source "$CURRENT_DIR/../shared/logging.sh"
+source "$CURRENT_DIR/lib/logging.sh"
 
 parse_args() {
     log DEBUG "Parsing arguments..."

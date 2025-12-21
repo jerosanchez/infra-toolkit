@@ -3,13 +3,16 @@ set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
-INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
 INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="app-stack"
 
 # Includes
-source "$CURRENT_DIR/../shared/logging.sh"
-export LOG_LEVEL="DEBUG"
+
+source "$CURRENT_DIR/../shared/lib/logging.sh"
+source "$CURRENT_DIR/../shared/lib/dependencies.sh"
+source "$CURRENT_DIR/../shared/lib/scheduling.sh"
+
+export LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
@@ -24,53 +27,9 @@ parse_args() {
 }
 
 run_pre_checks() {
-    log DEBUG "Running pre-checks..."
-    if [ ! -f "$INSTALL_DOCKER_SCRIPT" ]; then
-        log ERROR "Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
-        exit 1
-    fi
     if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
         log ERROR "Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
-    fi
-}
-
-install_docker_if_needed() {
-    log DEBUG "Installing Docker..."
-    if ! command -v docker >/dev/null 2>&1; then
-        bash "$INSTALL_DOCKER_SCRIPT"
-        log INFO "Docker installation initiated. Please reboot the server and re-run this script."
-        exit 0
-    else
-        log DEBUG "Docker already installed."
-    fi
-}
-
-install_docker_compose_if_needed() {
-    log DEBUG "Checking Docker Compose installation..."
-    if ! docker compose version >/dev/null 2>&1; then
-        log ERROR "Docker Compose plugin not found. Please install Docker Compose V2."
-        exit 1
-    else
-        log DEBUG "Docker Compose already installed."
-    fi
-}
-
-install_postgres_client_if_needed() {
-    log DEBUG "Installing PostgreSQL client tools..."
-    if ! command -v psql >/dev/null 2>&1; then
-        sudo apt-get update && sudo apt-get install -y postgresql-client
-    else
-        log DEBUG "PostgreSQL client already installed."
-    fi
-}
-
-install_git_if_needed() {
-    log DEBUG "Installing Git..."
-    if ! command -v git >/dev/null 2>&1; then
-        sudo apt-get update && sudo apt-get install -y git
-    else
-        log DEBUG "Git already installed."
     fi
 }
 
@@ -79,7 +38,7 @@ install_dependencies() {
     install_docker_if_needed
     install_docker_compose_if_needed
     install_postgres_client_if_needed
-    install_git_if_needed
+    install_crontab_if_needed
 }
 
 copy_file() {
@@ -114,18 +73,16 @@ copy_script() {
     sudo chmod +x "$dest_dir/$file_name"
 }
 
+
+# Use shared scheduling function for cron jobs
 schedule_backup_cron() {
-    log INFO "Scheduling database backup job..."
-    # Schedules the database backup script to run daily at 2 AM
-    local cron_line="0 2 * * * /opt/$SERVER_ROLE/backup-database.sh >/var/log/app-stack-backup.log 2>&1"
-    (sudo crontab -l 2>/dev/null | grep -v "/opt/$SERVER_ROLE/backup-database.sh" || true; echo "$cron_line") | sudo crontab -
+    local daily_2am_cron="0 2 * * *"
+    schedule "$SERVER_ROLE" "backup-database.sh" "$daily_2am_cron"
 }
 
 schedule_cleanup_cron() {
-    log INFO "Scheduling backup cleanup job..."
-    # Schedule the cleanup script to run daily at 3 PM
-    local cron_line="0 15 * * * /opt/$SERVER_ROLE/cleanup-backups.sh >/var/log/app-stack-backup-cleanup.log 2>&1"
-    (sudo crontab -l 2>/dev/null | grep -v "/opt/$SERVER_ROLE/cleanup-backups.sh" || true; echo "$cron_line") | sudo crontab -
+    local daily_3pm_cron="0 15 * * *"
+    schedule "$SERVER_ROLE" "cleanup-backups.sh" "$daily_3pm_cron"
 }
 
 install_role() {
@@ -135,15 +92,17 @@ install_role() {
 
     # Additional role-specific installation tasks
     copy_script "Copying database backup script..." "$CURRENT_DIR/backup-database.sh"
-    schedule_backup_cron
     copy_script "Copying backup cleanup script..." "$CURRENT_DIR/cleanup-backups.sh"
+
+    schedule_backup_cron
     schedule_cleanup_cron
 }
 
 print_success_message() {
-    log INFO "Installation complete."
-    log INFO "Edit /opt/$SERVER_ROLE/.env and compose files with your configuration."
-    log INFO "Then start the service: sudo systemctl start $SERVER_ROLE.service"
+    echo "Installation complete."
+    
+    echo "Edit /opt/$SERVER_ROLE/.env and compose files with your configuration."
+    echo "Then start the service: sudo systemctl start $SERVER_ROLE.service"
 }
 
 main() {

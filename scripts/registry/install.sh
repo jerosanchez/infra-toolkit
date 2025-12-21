@@ -3,13 +3,15 @@ set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
-INSTALL_DOCKER_SCRIPT="$CURRENT_DIR/../shared/install-docker.sh"
 INSTALL_ROLE_SCRIPT="$CURRENT_DIR/../shared/install-role.sh"
 SERVER_ROLE="registry"
 
 # Includes
-source "$CURRENT_DIR/../shared/logging.sh"
-LOG_LEVEL="INFO"
+source "$CURRENT_DIR/../shared/lib/logging.sh"
+source "$CURRENT_DIR/../shared/lib/dependencies.sh"
+source "$CURRENT_DIR/../shared/lib/scheduling.sh"
+
+export LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
@@ -24,23 +26,9 @@ parse_args() {
 }
 
 run_pre_checks() {
-    log DEBUG "Running pre-checks..."
-    if [ ! -f "$INSTALL_DOCKER_SCRIPT" ]; then
-        log ERROR "Docker install script not found or not executable: $INSTALL_DOCKER_SCRIPT"
-        exit 1
-    fi
     if [ ! -f "$INSTALL_ROLE_SCRIPT" ]; then
         log ERROR "Shared install script not found or not executable: $INSTALL_ROLE_SCRIPT"
         exit 1
-    fi
-}
-
-install_jq_if_needed() {
-    log DEBUG "Installing 'jq' (JSON tool)..."
-    if ! command -v jq >/dev/null 2>&1; then
-        sudo apt-get update && sudo apt-get install -y jq
-    else
-        log DEBUG "'jq' already installed."
     fi
 }
 
@@ -83,11 +71,11 @@ copy_cleanup_script() {
     fi
 }
 
+
+# Use shared scheduling function for cron jobs
 schedule_cleanup_cron() {
-    log INFO "Scheduling cleanup job..."
-    # Schedule the cleanup script to run daily at 2 AM
-    local cron_line="0 2 * * * /opt/registry/cleanup-registry.sh 7 >/var/log/registry-cleanup.log 2>&1"
-    (sudo crontab -l 2>/dev/null | grep -v '/opt/registry/cleanup-registry.sh' || true; echo "$cron_line") | sudo crontab -
+    local daily_2am_cron="0 2 * * *"
+    schedule "$SERVER_ROLE" "cleanup-registry.sh" "$daily_2am_cron"
 }
 
 install_role() {
@@ -105,6 +93,7 @@ start_registry() {
 
 print_success_message() {
     echo "Installation complete."
+    
     echo "Edit /opt/$SERVER_ROLE/.env with your configuration."
     echo "Then start the service: sudo systemctl start $SERVER_ROLE.service"
 }

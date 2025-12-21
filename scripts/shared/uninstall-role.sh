@@ -9,7 +9,7 @@ SERVER_ROLE=""
 INSTALL_DIR=""
 
 # Includes
-source "$CURRENT_DIR/logging.sh"
+source "$CURRENT_DIR/lib/logging.sh"
 
 parse_args() {
     log DEBUG "Parsing arguments..."

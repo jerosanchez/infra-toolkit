@@ -12,7 +12,6 @@ Setting up a private Docker registry in your home lab is now fully automated usi
 
 ---
 
-
 ## Step 1: Automated Installation & Manual Start
 
 All steps—installing dependencies, configuring the registry, and setting up persistence—are fully automated. **However, starting the registry service is now a manual step after installation.**

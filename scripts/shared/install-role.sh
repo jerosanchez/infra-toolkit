@@ -11,7 +11,7 @@ SOURCE_PATH=""
 INSTALL_PATH=""
 
 # Includes
-source "$CURRENT_DIR/logging.sh"
+source "$CURRENT_DIR/lib/logging.sh"
 
 parse_args() {
 	log DEBUG "Parsing arguments..."

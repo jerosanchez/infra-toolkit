@@ -4,7 +4,7 @@ set -euo pipefail
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 # Includes
-source "$CURRENT_DIR/../shared/logging.sh"
+source "$CURRENT_DIR/../../shared/lib/logging.sh"
 
 print_usage() {
     echo "Usage: $0"
@@ -53,8 +53,8 @@ main() {
     install_docker
     add_user_to_docker_group
     
-    log INFO "Docker installation complete."
-    log WARN "You must reboot the server to complete the installation."
+    echo "Docker installation complete."
+    echo "You must reboot the server to complete the installation."
 }
 
 main "$@"

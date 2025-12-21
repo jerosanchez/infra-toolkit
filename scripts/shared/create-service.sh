@@ -8,7 +8,7 @@ LAUNCH_SCRIPT=""
 SERVICE_FILE=""
 
 # Includes
-source "$SCRIPT_DIR/logging.sh"
+source "$SCRIPT_DIR/lib/logging.sh"
 
 parse_args() {
     log DEBUG "Parsing arguments..."
