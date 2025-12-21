@@ -11,7 +11,7 @@ These scripts automate the complete lifecycle of an application stack:
 - Install required dependencies (Docker, Docker Compose, PostgreSQL client, Git)
 - Configure the stack using environment variables
 - Deploy both application and database containers via Docker Compose
-- Create a systemd service for automatic startup after reboots
+- Create a systemd service for automatic startup after reboots (service is enabled, but not started during installation)
 - Provide clean uninstallation to repurpose the server for other roles
 
 ---
@@ -52,8 +52,8 @@ This command will:
 2. Install Docker Compose, PostgreSQL client tools, and Git
 3. Copy all necessary files to `/opt/app-stack/`
 4. Create a systemd service named `app-stack.service`
-5. Enable the service for automatic startup
-6. Start the service
+5. Enable the service for automatic startup (the service is enabled by default)
+6. To start the app stack, either reboot the server (the service will start automatically), or start it manually if you don't want to reboot
 
 After installation, configure your stack settings:
 
@@ -81,13 +81,16 @@ COMPOSE_PROJECT_NAME="app-stack"
 
 > **Note:** You will most likely also need to update `/opt/app-stack/docker-compose.yml` to match your application's requirements, such as image names, ports, volumes, or service definitions. Ensure both `.env` and `docker-compose.yml` are consistent for your environment.
 
-The systemd service will automatically start the app stack on the next system startup. To start the stack immediately without rebooting, run:
+To start the app stack after installation, you have two options:
 
-```bash
-sudo /opt/app-stack/start-app-stack.sh
-```
+- **Reboot the server:** The app stack will start automatically on boot.
+- **Start manually without rebooting:**
 
-or restart the service:
+    ```bash
+    sudo /opt/app-stack/start-app-stack.sh
+    ```
+
+Or restart the service:
 
 ```bash
 sudo systemctl restart app-stack.service

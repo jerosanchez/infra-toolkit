@@ -12,14 +12,16 @@ Setting up a private Docker registry in your home lab is now fully automated usi
 
 ---
 
-## Step 1: Automated Installation & Management
 
-All steps—installing dependencies, configuring the registry, setting up persistence, and managing the registry lifecycle—are fully automated.
+## Step 1: Automated Installation & Manual Start
+
+All steps—installing dependencies, configuring the registry, and setting up persistence—are fully automated. **However, starting the registry service is now a manual step after installation.**
 
 **Follow the instructions in [`infra-toolkit/scripts/registry/README.md`](../../scripts/registry/README.md) to:**
 
 - Install the registry with a single command (`make registry`)
 - Configure your `.env` file.
+- Start the registry manually after installation** (see the README for the exact command)
 - Understand how the automation works under the hood
 
 ---

@@ -11,7 +11,7 @@ These scripts automate the complete lifecycle of a Docker registry service:
 - Install required dependencies (Docker)
 - Configure the registry using environment variables
 - Deploy the registry as a Docker container
-- Create a systemd service for automatic startup after reboots
+- Create a systemd service for easy management and optional automatic startup after reboots
 - Provide clean uninstallation to repurpose the server for other roles
 
 ---
@@ -49,8 +49,8 @@ This command will:
 1. Check for Docker installation and install it if missing (requires reboot)
 2. Copy all necessary files to `/opt/registry/`
 3. Create a systemd service named `registry.service`
-4. Enable the service for automatic startup
-5. Start the service
+4. Enable the service for automatic startup (the service is enabled by default)
+5. To start the registry, either reboot the server (the service will start automatically), or start it manually if you don't want to reboot
 
 After installation, configure your registry settings:
 
@@ -66,7 +66,10 @@ REGISTRY_PORT="5000"
 REGISTRY_DATA_DIR="/opt/registry/data"
 ```
 
-Start the registry service:
+To start the registry service, you have two options:
+
+- **Reboot the server:** The registry service will start automatically on boot.
+- **Start manually without rebooting:**
 
 ```bash
 sudo systemctl start registry.service
