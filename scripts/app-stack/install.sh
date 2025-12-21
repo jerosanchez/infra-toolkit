@@ -81,29 +81,33 @@ install_dependencies() {
     install_git_if_needed
 }
 
-copy_compose_file() {
-    log INFO "Copying Docker Compose file..."
+copy_file() {
+    local message="$1"
+    local file_src="$2"
     local dest_dir="/opt/$SERVER_ROLE"
-    local compose_src="$CURRENT_DIR/docker-compose.yml"
-    if [ -f "$compose_src" ]; then
-        sudo cp "$compose_src" "$dest_dir/"
+    local file_name
+    file_name="$(basename "$file_src")"
+
+    log INFO "$message"
+    if [ -f "$file_src" ]; then
+        sudo cp "$file_src" "$dest_dir/"
+        sudo chmod +x "$dest_dir/$file_name"
     else
-        log ERROR "Docker Compose file not found: $compose_src"
+        log ERROR "File not found: $file_src"
         exit 1
     fi
 }
 
-copy_cleanup_script() {
-    log INFO "Copying backup cleanup script..."
+copy_script() {
+    local message="$1"
+    local file_src="$2"
     local dest_dir="/opt/$SERVER_ROLE"
-    local script_src="$CURRENT_DIR/cleanup-backups.sh"
-    if [ -f "$script_src" ]; then
-        sudo cp "$script_src" "$dest_dir/"
-        sudo chmod +x "$dest_dir/cleanup-backups.sh"
-    else
-        log ERROR "Cleanup script not found: $script_src"
-        exit 1
-    fi
+    local file_name
+    file_name="$(basename "$file_src")"
+
+    copy_file "$message" "$file_src"
+    
+    sudo chmod +x "$dest_dir/$file_name"
 }
 
 schedule_cleanup_cron() {
@@ -118,8 +122,9 @@ install_role() {
     LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific installation tasks
-    copy_compose_file
-    copy_cleanup_script
+    copy_file "Copying Docker Compose file..." "$CURRENT_DIR/docker-compose.yml"
+    copy_script "Copying database backup script..." "$CURRENT_DIR/backup-database.sh"
+    copy_script "Copying backup cleanup script..." "$CURRENT_DIR/cleanup-backups.sh"
     schedule_cleanup_cron
 }
 
