@@ -22,6 +22,11 @@ run_pre_checks() {
     fi
 }
 
+load_env() {
+    # shellcheck source=/dev/null
+    source "$ENV_FILE"
+}
+
 ensure_data_dir() {
     if [ ! -d "$POSTGRES_DATA_DIR" ]; then
         mkdir -p "$POSTGRES_DATA_DIR"
@@ -36,6 +41,7 @@ start_app_stack() {
 main() {
     parse_args "$@"
     run_pre_checks
+    load_env
     ensure_data_dir
     start_app_stack
 

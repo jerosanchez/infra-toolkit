@@ -9,6 +9,7 @@ SERVER_ROLE="app-stack"
 
 # Includes
 source "$CURRENT_DIR/../shared/logging.sh"
+export LOG_LEVEL="DEBUG"
 
 print_usage() {
     echo "Usage: $0"
@@ -89,6 +90,9 @@ copy_file() {
     file_name="$(basename "$file_src")"
 
     log INFO "$message"
+    if [ ! -d "$dest_dir" ]; then
+        sudo mkdir -p "$dest_dir"
+    fi
     if [ -f "$file_src" ]; then
         sudo cp "$file_src" "$dest_dir/"
         sudo chmod +x "$dest_dir/$file_name"
@@ -110,22 +114,36 @@ copy_script() {
     sudo chmod +x "$dest_dir/$file_name"
 }
 
+schedule_backup_cron() {
+    log INFO "Scheduling database backup job..."
+    # Schedules the database backup script to run daily at 2 AM
+    local cron_line="0 2 * * * /opt/$SERVER_ROLE/backup-database.sh >/var/log/app-stack-backup.log 2>&1"
+    (sudo crontab -l 2>/dev/null | grep -v "/opt/$SERVER_ROLE/backup-database.sh" || true; echo "$cron_line") | sudo crontab -
+}
+
 schedule_cleanup_cron() {
     log INFO "Scheduling backup cleanup job..."
-    # Schedule the cleanup script to run daily at 3 AM
-    local cron_line="0 3 * * * /opt/$SERVER_ROLE/cleanup-backups.sh >/var/log/app-stack-backup-cleanup.log 2>&1"
+    # Schedule the cleanup script to run daily at 3 PM
+    local cron_line="0 15 * * * /opt/$SERVER_ROLE/cleanup-backups.sh >/var/log/app-stack-backup-cleanup.log 2>&1"
     (sudo crontab -l 2>/dev/null | grep -v "/opt/$SERVER_ROLE/cleanup-backups.sh" || true; echo "$cron_line") | sudo crontab -
 }
 
 install_role() {
-    log INFO "Installing app-stack role..."
-    LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
+    copy_file "Copying Docker Compose file..." "$CURRENT_DIR/docker-compose.yml"
+
+    sudo LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific installation tasks
-    copy_file "Copying Docker Compose file..." "$CURRENT_DIR/docker-compose.yml"
     copy_script "Copying database backup script..." "$CURRENT_DIR/backup-database.sh"
+    schedule_backup_cron
     copy_script "Copying backup cleanup script..." "$CURRENT_DIR/cleanup-backups.sh"
     schedule_cleanup_cron
+}
+
+print_success_message() {
+    log INFO "Installation complete."
+    log INFO "Edit /opt/$SERVER_ROLE/.env and compose files with your configuration."
+    log INFO "Then start the service: sudo systemctl start $SERVER_ROLE.service"
 }
 
 main() {
@@ -133,8 +151,7 @@ main() {
     run_pre_checks
     install_dependencies
     install_role
-    log INFO "Installation complete. Edit /opt/$SERVER_ROLE/.env and compose files with your configuration."
-    log INFO "Then start the service: sudo systemctl start $SERVER_ROLE.service"
+    print_success_message
 }
 
 main "$@"

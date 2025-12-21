@@ -8,7 +8,7 @@ SERVER_ROLE="registry"
 
 # Includes
 source "$CURRENT_DIR/../shared/logging.sh"
-export LOG_LEVEL="DEBUG"
+export LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
@@ -87,7 +87,7 @@ main() {
     cleanup_data_dir
     remove_cleanup_cron
 
-    log INFO "Registry uninstallation complete."
+    echo "Uninstallation complete."
 }
 
 main "$@"

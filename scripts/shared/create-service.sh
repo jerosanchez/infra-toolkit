@@ -49,9 +49,9 @@ EOF
 
 start_service() {
     log INFO "Starting service..."
+    log DEBUG "Enabling and starting $SERVICE_NAME service..."
     sudo systemctl daemon-reload
     sudo systemctl enable "$SERVICE_NAME.service"
-    sudo systemctl start "$SERVICE_NAME.service"
 }
 
 main() {

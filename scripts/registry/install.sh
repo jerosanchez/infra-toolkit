@@ -9,6 +9,7 @@ SERVER_ROLE="registry"
 
 # Includes
 source "$CURRENT_DIR/../shared/logging.sh"
+LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
@@ -55,7 +56,7 @@ install_crontab_if_needed() {
 install_docker_if_needed() {
     log DEBUG "Installing Docker..."
     if ! command -v docker >/dev/null 2>&1; then
-        bash "$INSTALL_DOCKER_SCRIPT"
+        sudo LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_DOCKER_SCRIPT"
         log INFO "Docker installation initiated. Please reboot the server and re-run this script."
         exit 0
     else
@@ -90,7 +91,7 @@ schedule_cleanup_cron() {
 }
 
 install_role() {
-    bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
+    LOG_LEVEL="$LOG_LEVEL" bash "$INSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific installation tasks
     copy_cleanup_script
@@ -102,14 +103,19 @@ start_registry() {
     sudo /opt/registry/start-registry.sh
 }
 
+print_success_message() {
+    echo "Installation complete."
+    echo "Edit /opt/$SERVER_ROLE/.env with your configuration."
+    echo "Then start the service: sudo systemctl start $SERVER_ROLE.service"
+}
+
 main() {
     parse_args "$@"
     install_dependencies
     run_pre_checks
     install_role
     start_registry
-    
-    log INFO "Registry installation complete."
+    print_success_message
 }
 
 main "$@"

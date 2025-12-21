@@ -8,7 +8,7 @@ SERVER_ROLE="app-stack"
 
 # Includes
 source "$CURRENT_DIR/../shared/logging.sh"
-export LOG_LEVEL="DEBUG"
+export LOG_LEVEL="INFO"
 
 print_usage() {
     echo "Usage: $0"
@@ -62,9 +62,13 @@ remove_containers() {
     fi
 }
 
+remove_backup_cron() {
+    log INFO "Removing database backup job..."
+    (sudo crontab -l 2>/dev/null | grep -v '/opt/app-stack/backup-database.sh' || true; echo "") | sudo crontab -
+}
+
 remove_cleanup_cron() {
     log INFO "Removing backup cleanup job..."
-    # Remove any line containing /opt/app-stack/cleanup-backups.sh
     (sudo crontab -l 2>/dev/null | grep -v '/opt/app-stack/cleanup-backups.sh' || true; echo "") | sudo crontab -
 }
 
@@ -72,6 +76,7 @@ uninstall_role() {
     LOG_LEVEL="$LOG_LEVEL" bash "$UNINSTALL_ROLE_SCRIPT" "$SERVER_ROLE"
 
     # Additional role-specific uninstallation tasks
+    remove_backup_cron
     remove_cleanup_cron
 }
 
@@ -83,7 +88,7 @@ main() {
     remove_containers
     uninstall_role
 
-    log INFO "App stack uninstallation complete."
+    echo  "App stack uninstallation complete."
 }
 
 main "$@"
