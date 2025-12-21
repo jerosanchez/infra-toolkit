@@ -81,7 +81,6 @@ main() {
     uninstall_role
     remove_existing_container
     cleanup_data_dir
-    remove_cleanup_cron
 
     echo "Uninstallation complete."
 }
